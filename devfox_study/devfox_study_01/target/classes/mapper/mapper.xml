@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.mapper">
+	<select id="getUser" resultType="model.LoginUser" parameterType="model.LoginUser">
+		select * from myhome_users_tbl where id=#{id} and pwd=#{pwd}
+	</select>
+	<select id="getIdCount" parameterType="String" resultType="Integer">
+		select count(*) from myhome_users_tbl where id = #{id}	
+	</select>
+	<insert id="putUser" parameterType="model.Member">
+		insert into myhome_users_tbl values(#{id},#{pwd},#{name},#{addr},#{phone},#{gender},#{email},#{job})
+	</insert>
+	<select id="getMaxNotice" resultType="Integer">
+		select max(seqno) from myhome_notice_tbl
+	</select>
+	<insert id="putNotice" parameterType="model.Notice">
+		insert into myhome_notice_tbl values(#{seqno},#{title},#{id},#{content},sysdate)
+	</insert>
+	<select id="getAllNotice" parameterType="model.FromTo" resultType="model.Notice">
+		select seqno, title, id, n_date notice_date
+		from (select rownum rn, seqno, title, id, n_date
+			from (select seqno, title, id, to_char(notice_date,'YY/MM/DD') n_date
+				from myhome_notice_tbl order by seqno desc))
+					where rn > #{from} and rn <![CDATA[<]]> #{to}
+	</select>
+	<select id="getNoticeCount" resultType="Integer">
+		select count(*) from myhome_notice_tbl
+	</select>
+	<select id="getNotice" parameterType="Integer" resultType="model.Notice">
+		select seqno, title, id, content, to_char(notice_date, 'YY/MM/DD') as "notice_date"
+		from myhome_notice_tbl where seqno = #{id}
+	</select>
+	<delete id="deleteNotice" parameterType="Integer">
+		delete from myhome_notice_tbl where seqno = #{id}
+	</delete>
+	<update id="updateNotice" parameterType="model.Notice">
+		update myhome_notice_tbl set title = #{title}, content = #{content} where seqno = #{seqno}
+	</update>
+</mapper>

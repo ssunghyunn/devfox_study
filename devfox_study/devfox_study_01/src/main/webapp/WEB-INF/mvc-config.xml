@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Uncomment and your base-package here:
+         <context:component-scan
+            base-package="org.springframework.samples.web"/>  -->
+            
+<!--      datasourceからsqlsessionまでDB関連従属オブジェクトである -->
+	<bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+	p:driverClassName="oracle.jdbc.OracleDriver"
+	p:url="jdbc:oracle:thin:@localhost:1521/XE"
+	p:username="hr"
+	p:password="hr">
+	</bean>
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+	p:dataSource-ref="datasource"
+	p:configLocation="classpath:mybatisConfig.xml"><!-- 設定ファイルパス -->
+	</bean>
+	
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory"/>
+	</bean>
+
+	
+    <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"></bean>
+	
+	<!-- <context:component-scan> 自動生成するオブジェクトを持つパッケージ -->
+	<context:component-scan base-package="controller,dao"></context:component-scan>
+
+<!-- 	アノテーションでフォームチェックする時、このように<mvc:annotation-driven/>宣言をしなければ動作しない。 -->
+	<mvc:annotation-driven/>
+
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	        <!-- Example: a logical view name of 'showMessage' is mapped to '/WEB-INF/jsp/showMessage.jsp' -->
+	        <property name="prefix" value="/"/>
+	        <property name="suffix" value=".jsp"/>
+	</bean>
+
+</beans>

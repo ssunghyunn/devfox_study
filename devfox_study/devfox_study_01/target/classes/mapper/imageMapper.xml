@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.imageMapper">
+	<select id="getMaxId" resultType="Integer">
+		select max(writing_id) from myhome_imagesbbs_tbl
+	</select>
+	<insert id="putImageBBS" parameterType="model.ImageBBS">
+		insert into myhome_imagesbbs_tbl values(#{writing_id},#{group_id},#{parent_id},#{order_no},sysdate,#{id},#{image_name},#{password},#{title},#{content})
+	</insert>
+	<select id="getAllImages" parameterType="model.FromTo" resultType="model.ImageBBS">
+		select writing_id, group_id, order_no, to_char(reg_date,'YY/MM/DD') "reg_date", id, image_name, password, title, content
+			from (select rownum rn, img.*
+				from (select writing_id, group_id, parent_id, order_no, reg_date, id, image_name, password, title, content 
+						from myhome_imagesbbs_tbl 
+						order by writing_id desc, order_no asc) img)
+		where rn > #{from} and rn <![CDATA[<]]> #{to}
+	</select>
+	<select id="getImageCount" resultType="Integer">
+		select count(*) from myhome_imagesbbs_tbl
+	</select>
+	<select id="getImage" resultType="model.ImageBBS">
+		select writing_id, group_id, parent_id, order_no, to_char(reg_date, 'YY/MM/DD') "reg_date", id, image_name, password, title, content
+		from myhome_imagesbbs_tbl
+		where writing_id = #{id}
+	</select>
+	<delete id="deleteImage" parameterType="Integer">
+		delete from myhome_imagesbbs_tbl where writing_id = #{id}
+	</delete>
+	<update id="updateImage" parameterType="model.ImageBBS">
+		update myhome_imagesbbs_tbl set title=#{title}, image_name=#{image_name}, content = #{content} where writing_id = #{writing_id}
+	</update>
+	<update id="updateOrderNo" parameterType="model.ImageBBS">
+		update myhome_imagesbbs_tbl set order_no = order_no + 1
+		where group_id = #{group_id} and order_no >= #{order_no}
+	</update>
+</mapper>
